@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classification</title>
+    <style>
+        #image-container {
+            margin-top: 20px;
+        }
+        #uploaded-image {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload an Image for Classification</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" id="file" name="file" accept="image/*">
+        <input type="button" value="Upload" onclick="uploadImage()">
+    </form>
+    
+    <div id="image-container">
+        <img id="uploaded-image" src="" alt="Uploaded Image" />
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        function uploadImage() {
+            const form = document.getElementById('upload-form');
+            const formData = new FormData(form);
+            
+            // Show the uploaded image
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    document.getElementById('uploaded-image').src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // Upload the image and get prediction
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<h2>Predicted: ${data.label}</h2><p>Confidence: ${data.confidence * 100}%</p>`;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

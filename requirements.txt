@@ -1,0 +1,5 @@
+tensorflow==2.8
+protobuf==3.19.0
+flask 
+pillow 
+numpy
